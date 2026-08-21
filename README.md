@@ -1,18 +1,45 @@
 # Recibo Online
 
-Sistema de emissão de recibos online para qualquer empresa. Crie sua conta, configure os dados da empresa (nome, CPF/CNPJ, cidade e assinatura) e emita recibos numerados com valor por extenso, prontos para imprimir ou compartilhar em PDF pelo WhatsApp.
+Sistema completo de emissão de recibos para qualquer empresa: cadastro de conta multi-empresa, geração de recibos numerados com valor por extenso, personalização com logo e assinatura, compartilhamento em PDF pelo WhatsApp e um dashboard com o total emitido.
+
+**🔗 Demo ao vivo:** [recibo-online-gratis.vercel.app](https://recibo-online-gratis.vercel.app)
+
+## Stack
+
+- **Next.js 15** (App Router) + **TypeScript**
+- **Tailwind CSS 4**
+- **Supabase** — autenticação, banco Postgres com Row Level Security e storage de arquivos
+- **jsPDF** + **html2canvas-pro** — geração de PDF no navegador
+- **Vitest** + **Testing Library** — testes automatizados
+
+## Screenshots
+
+> _Espaço reservado — adicione aqui prints do dashboard, do formulário de novo recibo e do recibo final gerado._
+
+| Dashboard | Recibo gerado |
+|---|---|
+| _(screenshot)_ | _(screenshot)_ |
 
 ## Funcionalidades
 
-- Criação de conta (email/senha) — cada conta tem seus próprios dados e recibos
+- Criação de conta (email/senha) com recuperação de senha por email — cada conta tem seus próprios dados e recibos, isolados por Row Level Security
 - Configuração da empresa com upload de logo e da imagem da assinatura
-- Emissão de recibo: cliente, CPF/CNPJ, valor (com extenso automático), descrição, forma de pagamento, data e opção de mostrar ou não a assinatura
+- Emissão de recibo: cliente, CPF/CNPJ, valor (com extenso automático em português), descrição, forma de pagamento, data e opção de mostrar ou não a assinatura
 - Numeração automática sequencial por ano (ex: 015/2026)
-- Visualização do recibo no layout tradicional, com assinatura
-- Imprimir / salvar em PDF e compartilhar o PDF no WhatsApp (no celular abre o menu de compartilhamento com o arquivo anexado)
+- Recibo com layout próprio, pronto para imprimir/salvar em PDF ou compartilhar via WhatsApp (Web Share API no celular)
 - Dashboard com total emitido, total do mês e lista de recibos com busca
 
-## Configuração (uma vez só)
+## Destaques técnicos
+
+- Autenticação e sessão via `@supabase/ssr`, com middleware protegendo as rotas autenticadas
+- Isolamento de dados entre contas garantido por políticas de Row Level Security no Postgres (não apenas na aplicação)
+- Geração de PDF client-side (sem servidor) capturando o recibo renderizado e convertendo em arquivo compartilhável
+- Conversor de valor numérico para texto por extenso em português, escrito do zero e coberto por testes
+- Suíte de testes automatizados (Vitest) cobrindo regras de negócio, renderização de componentes e o fluxo de geração/compartilhamento do PDF
+
+---
+
+## Rodando o projeto localmente
 
 ### 1. Supabase (banco de dados e login — gratuito)
 
