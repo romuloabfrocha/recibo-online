@@ -17,7 +17,6 @@ export default function ReceiptView({
   const valorFormatado = formatarMoeda(Number(receipt.amount));
   const extenso = valorPorExtenso(Number(receipt.amount));
   const mostrarAssinatura = receipt.show_signature && profile.signature_url;
-  const emitidoEm = `${profile.city ? `${profile.city} · ` : ""}${dataPorExtenso(receipt.receipt_date)}`;
 
   return (
     <div
@@ -92,131 +91,85 @@ export default function ReceiptView({
         </div>
       </div>
 
-      <div style={{ padding: "36px 40px 44px" }}>
-        {/* Recebido de / Emitido em */}
-        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-          <div style={{ flex: "1 1 240px" }}>
-            <p
-              style={{
-                fontSize: "10px",
-                letterSpacing: "2px",
-                color: "#94a3b8",
-                textTransform: "uppercase",
-                fontWeight: 700,
-                marginBottom: "4px",
-              }}
-            >
-              Recebido de
-            </p>
-            <p style={{ fontSize: "15px", fontWeight: 700 }}>
-              {receipt.client_name}
-            </p>
-            {receipt.client_cpf_cnpj && (
-              <p style={{ fontSize: "12px", color: "#64748b" }}>
-                {receipt.client_cpf_cnpj}
-              </p>
-            )}
-          </div>
-          <div style={{ flex: "1 1 200px" }}>
-            <p
-              style={{
-                fontSize: "10px",
-                letterSpacing: "2px",
-                color: "#94a3b8",
-                textTransform: "uppercase",
-                fontWeight: 700,
-                marginBottom: "4px",
-              }}
-            >
-              Emitido em
-            </p>
-            <p style={{ fontSize: "13px", color: "#334155" }}>{emitidoEm}</p>
-          </div>
-        </div>
-
-        {/* Linha do item */}
+      <div style={{ padding: "40px 44px 48px" }}>
+        {/* Valor em destaque */}
         <div
           style={{
-            marginTop: "24px",
-            border: "1px solid #e2e8f0",
-            borderRadius: "10px",
-            overflow: "hidden",
+            background: "linear-gradient(135deg, #fffbeb 0%, #fff 100%)",
+            border: "1px solid #fde68a",
+            borderRadius: "12px",
+            textAlign: "center",
+            padding: "26px",
           }}
         >
-          <div
+          <p
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "12px",
-              padding: "10px 16px",
-              backgroundColor: "#f8fafc",
-              borderBottom: "1px solid #e2e8f0",
-              fontSize: "10px",
-              letterSpacing: "1.5px",
+              fontSize: "11px",
+              letterSpacing: "3px",
+              color: "#92400e",
               textTransform: "uppercase",
               fontWeight: 700,
-              color: "#94a3b8",
             }}
           >
-            <span>Descrição</span>
-            <span>Valor</span>
-          </div>
+            Valor recebido
+          </p>
+          <p
+            style={{
+              fontSize: "36px",
+              fontWeight: 800,
+              color: INK,
+              margin: "6px 0 4px",
+            }}
+          >
+            {valorFormatado}
+          </p>
+          <p style={{ fontSize: "13px", color: "#78350f", fontStyle: "italic" }}>
+            ({extenso})
+          </p>
+        </div>
+
+        {/* Texto explicativo do recibo */}
+        <p
+          style={{
+            fontSize: "14.5px",
+            lineHeight: 1.9,
+            textAlign: "justify",
+            marginTop: "28px",
+            color: "#1e293b",
+          }}
+        >
+          Eu, <strong>{profile.company_name || "___________________"}</strong>
+          {profile.cpf_cnpj && (
+            <>
+              , inscrito(a) no CPF/CNPJ sob o nº{" "}
+              <strong>{profile.cpf_cnpj}</strong>
+            </>
+          )}
+          , declaro que recebi de <strong>{receipt.client_name}</strong>
+          {receipt.client_cpf_cnpj && (
+            <>
+              , inscrito(a) no CPF/CNPJ sob o nº{" "}
+              <strong>{receipt.client_cpf_cnpj}</strong>
+            </>
+          )}
+          , a importância de <strong>{valorFormatado}</strong> ({extenso}),
+          referente a:
+        </p>
+
+        {receipt.description && (
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "12px",
-              padding: "16px",
+              borderLeft: `3px solid ${GOLD}`,
+              backgroundColor: "#f8fafc",
+              borderRadius: "0 8px 8px 0",
+              padding: "14px 18px",
+              margin: "16px 0 0",
               fontSize: "14px",
             }}
           >
-            <span>{receipt.description || "Serviço prestado"}</span>
-            <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>
-              {valorFormatado}
-            </span>
+            {receipt.description}
           </div>
-        </div>
-
-        {/* Total */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginTop: "18px",
-            padding: "18px 20px",
-            backgroundColor: "#fffbeb",
-            border: "1px solid #fde68a",
-            borderRadius: "10px",
-          }}
-        >
-          <div>
-            <p
-              style={{
-                fontSize: "10px",
-                letterSpacing: "2px",
-                color: "#92400e",
-                textTransform: "uppercase",
-                fontWeight: 700,
-              }}
-            >
-              Total recebido
-            </p>
-            <p
-              style={{
-                fontSize: "12px",
-                color: "#78350f",
-                fontStyle: "italic",
-                marginTop: "2px",
-              }}
-            >
-              ({extenso})
-            </p>
-          </div>
-          <p style={{ fontSize: "30px", fontWeight: 800, color: "#78350f" }}>
-            {valorFormatado}
-          </p>
-        </div>
+        )}
 
         {receipt.payment_method && (
           <p style={{ marginTop: "16px" }}>
@@ -236,15 +189,27 @@ export default function ReceiptView({
           </p>
         )}
 
-        <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "18px" }}>
-          Este recibo comprova a quitação integral do valor acima descrito e
-          produz efeitos legais.
+        <p style={{ fontSize: "14px", color: "#475569", marginTop: "22px" }}>
+          Para maior clareza, firmo o presente recibo para que produza os seus
+          efeitos legais.
+        </p>
+
+        <p
+          style={{
+            fontSize: "13px",
+            color: "#64748b",
+            textAlign: "center",
+            marginTop: "24px",
+          }}
+        >
+          {profile.city ? `${profile.city}, ` : ""}
+          {dataPorExtenso(receipt.receipt_date)}
         </p>
 
         {/* Assinatura — bem mais abaixo, em bloco próprio */}
         <div
           style={{
-            marginTop: "88px",
+            marginTop: "72px",
             paddingTop: "24px",
             borderTop: "1px dashed #cbd5e1",
             textAlign: "center",
