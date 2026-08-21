@@ -3,7 +3,8 @@ import { numeroRecibo, type Profile, type Receipt } from "@/lib/types";
 
 const FONT_STACK =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-const ACCENT = "#2563eb";
+const INK = "#0f172a";
+const GOLD = "#d97706";
 
 // Estilos inline com cores hex para compatibilidade com a captura do PDF (html2canvas)
 export default function ReceiptView({
@@ -13,8 +14,10 @@ export default function ReceiptView({
   receipt: Receipt;
   profile: Profile;
 }) {
+  const valorFormatado = formatarMoeda(Number(receipt.amount));
   const extenso = valorPorExtenso(Number(receipt.amount));
   const mostrarAssinatura = receipt.show_signature && profile.signature_url;
+  const emitidoEm = `${profile.city ? `${profile.city} · ` : ""}${dataPorExtenso(receipt.receipt_date)}`;
 
   return (
     <div
@@ -22,221 +25,261 @@ export default function ReceiptView({
       className="print-area"
       style={{
         backgroundColor: "#ffffff",
-        color: "#1f2937",
+        color: INK,
         maxWidth: "700px",
         margin: "0 auto",
         fontFamily: FONT_STACK,
-        borderRadius: "12px",
+        borderRadius: "14px",
         overflow: "hidden",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
       }}
     >
-      {/* Barra de destaque */}
-      <div style={{ height: "8px", backgroundColor: ACCENT }} />
-
-      <div style={{ padding: "40px 48px" }}>
-        {/* Cabeçalho */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "16px",
-            paddingBottom: "24px",
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            {profile.logo_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.logo_url}
-                alt="Logo"
-                crossOrigin="anonymous"
-                style={{
-                  height: "52px",
-                  width: "52px",
-                  objectFit: "contain",
-                  borderRadius: "8px",
-                }}
-              />
-            )}
-            <div>
-              <p
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "#111827",
-                  lineHeight: 1.3,
-                }}
-              >
-                {profile.company_name || "Empresa"}
-              </p>
-              {profile.cpf_cnpj && (
-                <p style={{ fontSize: "12px", color: "#6b7280" }}>
-                  {profile.cpf_cnpj}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div style={{ textAlign: "right" }}>
-            <p
+      {/* Faixa de cabeçalho */}
+      <div
+        style={{
+          backgroundColor: INK,
+          padding: "28px 40px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          {profile.logo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.logo_url}
+              alt="Logo"
+              crossOrigin="anonymous"
               style={{
-                fontSize: "22px",
-                fontWeight: 800,
-                color: ACCENT,
-                letterSpacing: "2px",
+                height: "44px",
+                width: "44px",
+                objectFit: "contain",
+                borderRadius: "8px",
+                backgroundColor: "#ffffff",
+                padding: "3px",
               }}
-            >
-              RECIBO
+            />
+          )}
+          <div>
+            <p style={{ fontSize: "16px", fontWeight: 700, color: "#ffffff" }}>
+              {profile.company_name || "Empresa"}
             </p>
-            <p style={{ fontSize: "12px", color: "#6b7280" }}>
-              Nº {numeroRecibo(receipt)}
-            </p>
+            {profile.cpf_cnpj && (
+              <p style={{ fontSize: "12px", color: "#94a3b8" }}>
+                {profile.cpf_cnpj}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Valor */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #eff6ff 0%, #f9fafb 100%)",
-            border: "1px solid #dbeafe",
-            borderRadius: "10px",
-            textAlign: "center",
-            padding: "24px",
-            margin: "28px 0",
-          }}
-        >
+        <div style={{ textAlign: "right" }}>
           <p
             style={{
               fontSize: "11px",
               letterSpacing: "3px",
-              color: "#6b7280",
+              color: "#94a3b8",
               textTransform: "uppercase",
               fontWeight: 600,
             }}
           >
-            Valor recebido
+            Recibo
           </p>
-          <p
-            style={{
-              fontSize: "34px",
-              fontWeight: 800,
-              color: "#111827",
-              margin: "4px 0",
-            }}
-          >
-            {formatarMoeda(Number(receipt.amount))}
-          </p>
-          <p style={{ fontSize: "13px", color: "#6b7280", fontStyle: "italic" }}>
-            ({extenso})
+          <p style={{ fontSize: "20px", fontWeight: 800, color: GOLD }}>
+            Nº {numeroRecibo(receipt)}
           </p>
         </div>
+      </div>
 
-        {/* Declaração */}
-        <p style={{ fontSize: "14px", lineHeight: 1.8, textAlign: "justify" }}>
-          Eu, <strong>{profile.company_name || "___________________"}</strong>
-          {profile.cpf_cnpj && (
-            <>
-              , inscrito(a) no CPF/CNPJ sob o nº{" "}
-              <strong>{profile.cpf_cnpj}</strong>
-            </>
-          )}
-          , declaro que recebi de <strong>{receipt.client_name}</strong>
-          {receipt.client_cpf_cnpj && (
-            <>
-              , inscrito(a) no CPF/CNPJ sob o nº{" "}
-              <strong>{receipt.client_cpf_cnpj}</strong>
-            </>
-          )}
-          , a importância de{" "}
-          <strong>{formatarMoeda(Number(receipt.amount))}</strong> ({extenso}),
-          referente a:
-        </p>
+      <div style={{ padding: "36px 40px 44px" }}>
+        {/* Recebido de / Emitido em */}
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 240px" }}>
+            <p
+              style={{
+                fontSize: "10px",
+                letterSpacing: "2px",
+                color: "#94a3b8",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: "4px",
+              }}
+            >
+              Recebido de
+            </p>
+            <p style={{ fontSize: "15px", fontWeight: 700 }}>
+              {receipt.client_name}
+            </p>
+            {receipt.client_cpf_cnpj && (
+              <p style={{ fontSize: "12px", color: "#64748b" }}>
+                {receipt.client_cpf_cnpj}
+              </p>
+            )}
+          </div>
+          <div style={{ flex: "1 1 200px" }}>
+            <p
+              style={{
+                fontSize: "10px",
+                letterSpacing: "2px",
+                color: "#94a3b8",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: "4px",
+              }}
+            >
+              Emitido em
+            </p>
+            <p style={{ fontSize: "13px", color: "#334155" }}>{emitidoEm}</p>
+          </div>
+        </div>
 
-        {receipt.description && (
+        {/* Linha do item */}
+        <div
+          style={{
+            marginTop: "24px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "10px",
+            overflow: "hidden",
+          }}
+        >
           <div
             style={{
-              borderLeft: `3px solid ${ACCENT}`,
-              backgroundColor: "#f9fafb",
-              borderRadius: "0 8px 8px 0",
-              padding: "14px 18px",
-              margin: "18px 0",
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "12px",
+              padding: "10px 16px",
+              backgroundColor: "#f8fafc",
+              borderBottom: "1px solid #e2e8f0",
+              fontSize: "10px",
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              color: "#94a3b8",
+            }}
+          >
+            <span>Descrição</span>
+            <span>Valor</span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "12px",
+              padding: "16px",
               fontSize: "14px",
             }}
           >
-            {receipt.description}
+            <span>{receipt.description || "Serviço prestado"}</span>
+            <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>
+              {valorFormatado}
+            </span>
           </div>
-        )}
+        </div>
+
+        {/* Total */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginTop: "18px",
+            padding: "18px 20px",
+            backgroundColor: "#fffbeb",
+            border: "1px solid #fde68a",
+            borderRadius: "10px",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                fontSize: "10px",
+                letterSpacing: "2px",
+                color: "#92400e",
+                textTransform: "uppercase",
+                fontWeight: 700,
+              }}
+            >
+              Total recebido
+            </p>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#78350f",
+                fontStyle: "italic",
+                marginTop: "2px",
+              }}
+            >
+              ({extenso})
+            </p>
+          </div>
+          <p style={{ fontSize: "30px", fontWeight: 800, color: "#78350f" }}>
+            {valorFormatado}
+          </p>
+        </div>
 
         {receipt.payment_method && (
-          <p style={{ fontSize: "13px", marginTop: "16px" }}>
+          <p style={{ marginTop: "16px" }}>
             <span
               style={{
                 display: "inline-block",
-                backgroundColor: "#eff6ff",
-                color: ACCENT,
+                backgroundColor: "#f1f5f9",
+                color: "#334155",
                 fontWeight: 600,
+                fontSize: "12px",
                 borderRadius: "999px",
-                padding: "4px 14px",
+                padding: "5px 14px",
               }}
             >
-              {receipt.payment_method}
+              Pagamento via {receipt.payment_method}
             </span>
           </p>
         )}
 
-        <p style={{ fontSize: "14px", marginTop: "20px", color: "#374151" }}>
-          Para maior clareza, firmo o presente recibo para que produza os seus
-          efeitos legais.
+        <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "18px" }}>
+          Este recibo comprova a quitação integral do valor acima descrito e
+          produz efeitos legais.
         </p>
 
-        {/* Rodapé: data e assinatura */}
+        {/* Assinatura — bem mais abaixo, em bloco próprio */}
         <div
           style={{
-            marginTop: "48px",
+            marginTop: "88px",
             paddingTop: "24px",
-            borderTop: "1px solid #e5e7eb",
+            borderTop: "1px dashed #cbd5e1",
             textAlign: "center",
           }}
         >
-          <p style={{ fontSize: "13px", color: "#6b7280" }}>
-            {profile.city ? `${profile.city}, ` : ""}
-            {dataPorExtenso(receipt.receipt_date)}
-          </p>
-
-          <div style={{ marginTop: "28px" }}>
-            {mostrarAssinatura && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.signature_url!}
-                alt="Assinatura"
-                crossOrigin="anonymous"
-                style={{
-                  maxHeight: "70px",
-                  maxWidth: "240px",
-                  margin: "0 auto",
-                  display: "block",
-                }}
-              />
-            )}
-            <div
+          {mostrarAssinatura && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.signature_url!}
+              alt="Assinatura"
+              crossOrigin="anonymous"
               style={{
-                borderTop: "1px solid #111827",
-                width: "260px",
-                margin: "8px auto 0",
-                paddingTop: "8px",
+                maxHeight: "70px",
+                maxWidth: "240px",
+                margin: "0 auto 8px",
+                display: "block",
               }}
-            >
-              <p style={{ fontSize: "14px", fontWeight: 600, color: "#111827" }}>
-                {profile.company_name || "Assinatura"}
+            />
+          )}
+          <div
+            style={{
+              borderTop: "1px solid #0f172a",
+              width: "260px",
+              margin: "0 auto",
+              paddingTop: "8px",
+            }}
+          >
+            <p style={{ fontSize: "14px", fontWeight: 600 }}>
+              {profile.company_name || "Assinatura"}
+            </p>
+            {profile.cpf_cnpj && (
+              <p style={{ fontSize: "12px", color: "#64748b" }}>
+                {profile.cpf_cnpj}
               </p>
-              {profile.cpf_cnpj && (
-                <p style={{ fontSize: "12px", color: "#6b7280" }}>
-                  {profile.cpf_cnpj}
-                </p>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
