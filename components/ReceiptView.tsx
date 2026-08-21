@@ -50,7 +50,6 @@ export default function ReceiptView({
             <img
               src={profile.logo_url}
               alt="Logo"
-              crossOrigin="anonymous"
               style={{
                 height: "44px",
                 width: "44px",
@@ -220,7 +219,6 @@ export default function ReceiptView({
             <img
               src={profile.signature_url!}
               alt="Assinatura"
-              crossOrigin="anonymous"
               style={{
                 maxHeight: "70px",
                 maxWidth: "240px",
