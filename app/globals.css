@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+body {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Impressão: mostra apenas o recibo */
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+}
